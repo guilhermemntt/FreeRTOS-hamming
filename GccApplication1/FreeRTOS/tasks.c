@@ -40,7 +40,10 @@ task.h is included from an application file. */
 #include "task.h"
 #include "timers.h"
 #include "stack_macros.h"
-#include "checksum.h"
+
+#if( configSUPPORT_TASK_CHECKSUM > 0 )
+	#include "checksum.h"
+#endif
 
 /* Lint e961 and e750 are suppressed as a MISRA exception justified because the
 MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
@@ -267,9 +270,6 @@ to its original value when it is released. */
  * and stores task state information, including a pointer to the task's context
  * (the task's run time environment, including register values)
  */
-uint16_t globa=0;
-uint16_t globa1=0;
-
 typedef struct tskTaskControlBlock
 {
 	volatile StackType_t	*pxTopOfStack;	/*< Points to the location of the last item placed on the tasks stack.  THIS MUST BE THE FIRST MEMBER OF THE TCB STRUCT. */
@@ -284,9 +284,8 @@ typedef struct tskTaskControlBlock
 	StackType_t			*pxStack;			/*< Points to the start of the stack. */
 	char				pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 	
-	#if( configSUPPORT_TASK_CHECKSUM == 1 )
-		uint16_t			ucChecksum;
-		uint32_t			ulStackDepth;
+	#if( configSUPPORT_TASK_CHECKSUM > 0 )
+		ChecksumType_t			ucChecksum;
 	#endif
 
 	#if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
@@ -874,7 +873,7 @@ UBaseType_t x;
 
 		/* Check the alignment of the calculated top of stack is correct. */
 		configASSERT( ( ( ( portPOINTER_SIZE_TYPE ) pxTopOfStack & ( portPOINTER_SIZE_TYPE ) portBYTE_ALIGNMENT_MASK ) == 0UL ) );
-//TODO trocar a variavl xxxxxxxxxxxxxx
+
 		#if( configRECORD_STACK_HIGH_ADDRESS == 1 )
 		{
 			/* Also record the stack's high address, which may assist
@@ -1030,14 +1029,6 @@ UBaseType_t x;
 	{
 		mtCOVERAGE_TEST_MARKER();
 	}
-	#if( configSUPPORT_TASK_CHECKSUM == 1 )
-	{
-		
-		pxNewTCB->ulStackDepth=ulStackDepth;
-		pxCurrentTCB->ucChecksum = uxChecksumGetTaskChecksum(pxNewTCB->pxTopOfStack, pxNewTCB->pxEndOfStack);
-															
-	}
-	#endif
 }
 /*-----------------------------------------------------------*/
 

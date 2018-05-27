@@ -174,10 +174,6 @@
 
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
-#define configSUPPORT_TASK_CHECKSUM         1
-#define configUSE_TASK_CHECKSUM_HOOK        1
-
-
 /* Set the following definitions to 1 to include the API function, or zero
 
 to exclude the API function. */
@@ -200,6 +196,10 @@ to exclude the API function. */
 
 #define INCLUDE_uxTaskGetHighWaterMark	1
 
+//
+
+#define configSUPPORT_TASK_CHECKSUM         3
+#define configUSE_TASK_CHECKSUM_HOOK		1
 
 
 #endif /* FREERTOS_CONFIG_H */

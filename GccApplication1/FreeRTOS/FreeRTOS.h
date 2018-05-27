@@ -376,7 +376,7 @@ extern "C" {
 #endif
 
 #ifndef configRECORD_STACK_HIGH_ADDRESS
-	#define configRECORD_STACK_HIGH_ADDRESS 1 //THIS IS ABSOLUTELY FOR THE CHECKSUM	ALGORITHMS
+	#define configRECORD_STACK_HIGH_ADDRESS 0
 #endif
 
 #ifndef configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H
@@ -1160,10 +1160,6 @@ typedef struct xSTATIC_STREAM_BUFFER
 
 /* Message buffers are built on stream buffers. */
 typedef StaticStreamBuffer_t StaticMessageBuffer_t;
-
-
-extern uint16_t globa;
-extern uint16_t globa1;
 
 
 #ifdef __cplusplus
