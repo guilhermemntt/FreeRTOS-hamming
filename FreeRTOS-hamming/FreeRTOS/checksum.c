@@ -47,6 +47,33 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
 
+
+static inline uint8_t fls(uint16_t x)
+{
+          uint8_t r = 16;
+  
+          if (!x)
+                  return 0;
+          if (!(x & 0xff00u)) {
+                  x <<= 8;
+                  r -= 8;
+          }
+          if (!(x & 0xf000u)) {
+                  x <<= 4;
+                  r -= 4;
+          }
+          if (!(x & 0xc0000u)) {
+                  x <<= 2;
+                  r -= 2;
+          }
+          if (!(x & 0x8000u)) {
+                  x <<= 1;
+                  r -= 1;
+          }
+         return r;
+  }
+
+
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
 	uint8_t * data_p=pxStartOfStack+1;
@@ -63,19 +90,35 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 		poolH ^= (*(data_p+i) & 0xAA);
 	}
 	hammingBits += (paridade(poolH))<<pBit;
+	
 	poolH = 0;
 	pBit = 1;
 	for(i=0;i<length;i++){
 		poolH ^= (*(data_p+i) & 0xCC);
 	}
 	hammingBits += (paridade(poolH))<<pBit;
+	
 	poolH = 0;
 	pBit = 2;
 	for(i=0;i<length;i++){
 		poolH ^= (*(data_p+i) & 0xF0);
 	}
 	hammingBits += (paridade(poolH))<<pBit;
-	for(pBit=3;(1<<pBit)<(length *8);pBit++){
+	
+	pBit=3;
+	poolH = 0;
+	posbit = (1<<(pBit-3));
+	for(i=0;i<length;i++){
+		if((i+1) & (posbit)){
+			poolH ^= (*(data_p+i));
+		}
+	}
+	hammingBits += (paridade(poolH))<<pBit;
+	
+	uint8_t pBitmax = fls(length+1)+2;
+	//for(pBit=4;((1<<(pBit-2))-1)<=(length);pBit++){
+	
+	for(pBit=4;pBit<=pBitmax;pBit++){
 		poolH = 0;
 		posbit = (1<<(pBit-3));
 		for(i=0;i<length;i++){

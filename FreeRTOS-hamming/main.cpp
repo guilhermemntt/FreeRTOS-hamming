@@ -8,13 +8,18 @@
 
 void task_tx(void* p)
 {
+	volatile uint8_t teste=45;
+	volatile uint8_t teste2=45;
 	while(1)
 	{
+		teste=50;
 	}
 }
 
 void task_rx(void* p)
 {	
+	volatile uint8_t teste=85;
+	volatile uint8_t teste2=45;
 	while(1)
 	{
 		
@@ -39,7 +44,7 @@ int main(void)
 extern "C"{
 	
 	void vApplicationTaskChecksumHook( void ){ 
-	//	globa=0x11;
+		globa=0x01;
 	}
 //
 //uint16_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)

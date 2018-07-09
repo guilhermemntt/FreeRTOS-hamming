@@ -9,6 +9,9 @@
 	extern "C" {
 #endif
 
+	
+	static inline uint8_t fls(uint16_t x);
+
 	#if( configSUPPORT_TASK_CHECKSUM > 0 )
 
 		
@@ -30,13 +33,14 @@
 		#if( configUSE_TASK_CHECKSUM_HOOK== 3 )
 
 			#define traceTASK_SWITCHED_IN() 	do{ \
-				if(pxCurrentTCB->ucChecksum == uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)){\
-					vApplicationTaskChecksumHook();\
-				} else {\
-					pxCurrentTCB->pxTopOfStack[(uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)^pxCurrentTCB->ucChecksum-8)/8 + 1]=\
-						pxCurrentTCB->pxTopOfStack[(uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)^pxCurrentTCB->ucChecksum-8)/8 +1]^\
-							(1<<((uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)^pxCurrentTCB->ucChecksum-8)%8));\
-				}\
+				pxCurrentTCB->ucChecksum ^= uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack); \
+				
+				if(pxCurrentTCB->ucChecksum == 0){ \
+					vApplicationTaskChecksumHook(); \
+				} else { \
+					pxCurrentTCB->ucChecksum -= (1+(1<<fls((pxCurrentTCB->pxEndOfStack-pxCurrentTCB->pxTopOfStack)+1)))*8; \
+					pxCurrentTCB->pxTopOfStack[pxCurrentTCB->ucChecksum /8 + 1] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
+				} \
 			}while(0);
 
 			void vApplicationTaskChecksumHook( void ) __attribute__((weak));
