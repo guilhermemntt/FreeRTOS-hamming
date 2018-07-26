@@ -115,10 +115,10 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 	}
 	hammingBits += (paridade(poolH))<<pBit;
 	
-	uint8_t pBitmax = fls(length+1)+2;
+	uint8_t pBitmax = fls(length*8);
 	//for(pBit=4;((1<<(pBit-2))-1)<=(length);pBit++){
 	
-	for(pBit=4;pBit<=pBitmax;pBit++){
+	for(pBit=4;pBit<pBitmax;pBit++){
 		poolH = 0;
 		posbit = (1<<(pBit-3));
 		for(i=0;i<length;i++){
