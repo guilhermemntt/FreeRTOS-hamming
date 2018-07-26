@@ -1,8 +1,6 @@
 #include "FreeRTOS.h"
 #include "checksum.h"
 
-#define paridade(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
-
 #if( configSUPPORT_TASK_CHECKSUM==1 )
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
@@ -47,13 +45,15 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
 
+#define paridade(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
 
 static inline uint8_t fls(uint16_t x)
 {
           uint8_t r = 16;
   
-          if (!x)
+          if (!x){
                   return 0;
+		  }
           if (!(x & 0xff00u)) {
                   x <<= 8;
                   r -= 8;
@@ -62,7 +62,7 @@ static inline uint8_t fls(uint16_t x)
                   x <<= 4;
                   r -= 4;
           }
-          if (!(x & 0xc0000u)) {
+          if (!(x & 0xc000u)) {
                   x <<= 2;
                   r -= 2;
           }

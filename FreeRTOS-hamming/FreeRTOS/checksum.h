@@ -38,12 +38,14 @@
 				if(pxCurrentTCB->ucChecksum == 0){ \
 					vApplicationTaskChecksumHook(); \
 				} else { \
-					pxCurrentTCB->ucChecksum -= (1+(1<<fls((pxCurrentTCB->pxEndOfStack-pxCurrentTCB->pxTopOfStack)+1)))*8; \
-					pxCurrentTCB->pxTopOfStack[pxCurrentTCB->ucChecksum /8 + 1] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
+					vApplicationTaskChecksumHook1(); \
+					//pxCurrentTCB->ucChecksum -= (1+(1<<fls((pxCurrentTCB->pxEndOfStack-pxCurrentTCB->pxTopOfStack)+1)))*8;\ 
+					pxCurrentTCB->pxTopOfStack[pxCurrentTCB->ucChecksum /8] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
 				} \
 			}while(0);
 
 			void vApplicationTaskChecksumHook( void ) __attribute__((weak));
+			void vApplicationTaskChecksumHook1( void ) __attribute__((weak));
 			
 		#else if( configUSE_TASK_CHECKSUM_HOOK== 2 )
 		
