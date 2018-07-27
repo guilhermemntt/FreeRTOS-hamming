@@ -79,7 +79,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 	uint8_t * data_p=pxStartOfStack+1;
 	uint16_t length = pxEndOfStack-pxStartOfStack;
 	uint8_t poolH;
-	uint16_t hammingBits = 0;
+	volatile uint16_t hammingBits = 0;
 	uint16_t pBit;
 	uint16_t i;
 	uint16_t posbit;
@@ -137,10 +137,11 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
     	ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack){}
 	
 #endif
-
+/*
 #if ( configUSE_TASK_CHECKSUM_HOOK == 1 )
 
 	void vApplicationTaskChecksumHook( void ){}
 
 #endif
+*/
 

@@ -28,7 +28,7 @@ void task_rx(void* p)
 
 
 volatile uint16_t globa;
-uint16_t globa1;
+volatile uint16_t globa1;
 
 
 int main(void)

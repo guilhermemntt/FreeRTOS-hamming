@@ -30,24 +30,24 @@
 			pxCurrentTCB->ucChecksum = uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack);\
 		}while(0);
 
-		#if( configUSE_TASK_CHECKSUM_HOOK== 3 )
+		#if( configSUPPORT_TASK_CHECKSUM== 3 )
 
 			#define traceTASK_SWITCHED_IN() 	do{ \
 				pxCurrentTCB->ucChecksum ^= uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack); \
-				
 				if(pxCurrentTCB->ucChecksum == 0){ \
 					vApplicationTaskChecksumHook(); \
 				} else { \
 					vApplicationTaskChecksumHook1(); \
-					//pxCurrentTCB->ucChecksum -= (1+(1<<fls((pxCurrentTCB->pxEndOfStack-pxCurrentTCB->pxTopOfStack)+1)))*8;\ 
 					pxCurrentTCB->pxTopOfStack[pxCurrentTCB->ucChecksum /8] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
 				} \
 			}while(0);
 
 			void vApplicationTaskChecksumHook( void ) __attribute__((weak));
 			void vApplicationTaskChecksumHook1( void ) __attribute__((weak));
-			
-		#else if( configUSE_TASK_CHECKSUM_HOOK== 2 )
+		
+		#endif
+		
+		#if( configSUPPORT_TASK_CHECKSUM== 2 )
 		
 			#define traceTASK_SWITCHED_IN() 	do{ \
 				if(pxCurrentTCB->ucChecksum == uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)){\

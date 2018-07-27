@@ -2905,9 +2905,7 @@ void vTaskSwitchContext( void )
 		taskSELECT_HIGHEST_PRIORITY_TASK();
 
 		traceTASK_SWITCHED_IN();
-
-
-
+		
 		#if ( configUSE_NEWLIB_REENTRANT == 1 )
 		{
 			/* Switch Newlib's _impure_ptr variable to point to the _reent
