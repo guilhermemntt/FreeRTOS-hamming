@@ -45,7 +45,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
 
-#define PARITY(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
+#define checksumPARITY(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
 
 static inline uint8_t prvFls(uint16_t uiX)
 {
@@ -89,21 +89,21 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 	for(i=0;i<usLength;i++){
 		ucPoolH ^= (*(pucDataP+i) & 0xAA);
 	}
-	usHammingBits += (PARITY(ucPoolH))<<usPBit;
+	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
 	
 	ucPoolH = 0;
 	usPBit = 1;
 	for(i=0;i<usLength;i++){
 		ucPoolH ^= (*(pucDataP+i) & 0xCC);
 	}
-	usHammingBits += (PARITY(ucPoolH))<<usPBit;
+	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
 	
 	ucPoolH = 0;
 	usPBit = 2;
 	for(i=0;i<usLength;i++){
 		ucPoolH ^= (*(pucDataP+i) & 0xF0);
 	}
-	usHammingBits += (PARITY(ucPoolH))<<usPBit;
+	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
 	
 	usPBit=3;
 	ucPoolH = 0;
@@ -113,7 +113,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 			ucPoolH ^= (*(pucDataP+i));
 		}
 	}
-	usHammingBits += (PARITY(ucPoolH))<<usPBit;
+	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
 	
 	uint8_t pBitmax = prvFls(usLength*8);
 	
@@ -125,7 +125,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 				ucPoolH ^= (*(pucDataP+i));
 			}
 		}
-		usHammingBits += (PARITY(ucPoolH))<<usPBit;
+		usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
 	}
 	return (ChecksumType_t)usHammingBits;
 }
