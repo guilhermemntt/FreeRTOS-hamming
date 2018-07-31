@@ -7,7 +7,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 {
 	volatile StackType_t* i;
 	uint16_t xChecksum = 0;
-	for(i = pxEndOfStack ;i > pxStartOfStack ;i+=portSTACK_GROWTH)
+	for(i = pxEndOfStack ;i != pxStartOfStack ;i+=portSTACK_GROWTH)
 	{
 		xChecksum^=*i;
 	}
@@ -18,7 +18,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
-	uint16_t	polinomio=0x8408;
+	uint16_t	uiPolinomio=0x8408;
 	uint8_t	i;
 	uint16_t	uiData;
 	uint16_t	uiCrc;
@@ -30,7 +30,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 	do{
 		for(i = 0, uiData = (uint16_t) 0xff && *pxStartOfStack++; i < 8; i++,uiData >>= 1){
 			if((uiCrc & 0x0001)^(uiData & 0x0001)){
-				uiCrc = (uiCrc >> 1)^polinomio;
+				uiCrc = (uiCrc >> 1)^uiPolinomio;
 			}
 			else{
 				uiCrc >>= 1;
@@ -47,30 +47,30 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #define paridade(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
 
-static inline uint8_t fls(uint16_t x)
+static inline uint8_t fls(uint16_t uiX)
 {
-          uint8_t r = 16;
+          uint8_t uiR = 16;
   
-          if (!x){
+          if (!uiX){
                   return 0;
 		  }
-          if (!(x & 0xff00u)) {
-                  x <<= 8;
-                  r -= 8;
+          if (!(uiX & 0xff00u)) {
+                  uiX <<= 8;
+                  uiR -= 8;
           }
-          if (!(x & 0xf000u)) {
-                  x <<= 4;
-                  r -= 4;
+          if (!(uiX & 0xf000u)) {
+                  uiX <<= 4;
+                  uiR -= 4;
           }
-          if (!(x & 0xc000u)) {
-                  x <<= 2;
-                  r -= 2;
+          if (!(uiX & 0xc000u)) {
+                  uiX <<= 2;
+                  uiR -= 2;
           }
-          if (!(x & 0x8000u)) {
-                  x <<= 1;
-                  r -= 1;
+          if (!(uiX & 0x8000u)) {
+                  uiX <<= 1;
+                  uiR -= 1;
           }
-         return r;
+         return uiR;
   }
 
 
@@ -137,11 +137,11 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
     	ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack){}
 	
 #endif
-/*
+
 #if ( configUSE_TASK_CHECKSUM_HOOK == 1 )
 
 	void vApplicationTaskChecksumHook( void ){}
 
 #endif
-*/
+
 

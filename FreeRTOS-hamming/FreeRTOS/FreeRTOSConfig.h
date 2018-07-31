@@ -198,7 +198,7 @@ to exclude the API function. */
 
 //
 
-#define configSUPPORT_TASK_CHECKSUM         3
+#define configSUPPORT_TASK_CHECKSUM         4
 #define configUSE_TASK_CHECKSUM_HOOK		1
 
 

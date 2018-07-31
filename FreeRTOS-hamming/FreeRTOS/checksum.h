@@ -67,6 +67,13 @@
 	#endif
 	
 	#if ( configSUPPORT_TASK_CHECKSUM==4 )
+	
+		#define traceTASK_SWITCHED_IN() 	do{ \
+			if(pxCurrentTCB->ucChecksum == uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)){\
+				vApplicationTaskChecksumHook();\
+			}\
+		}while(0);
+	
 		ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack) __attribute__((weak));
 	#endif
 	
