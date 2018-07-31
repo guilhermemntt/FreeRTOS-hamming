@@ -45,9 +45,9 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
 
-#define paridade(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
+#define PARITY(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
 
-static inline uint8_t uiFls(uint16_t uiX)
+static inline uint8_t ucFls(uint16_t uiX)
 {
           uint8_t uiR = 16;
   
@@ -76,59 +76,58 @@ static inline uint8_t uiFls(uint16_t uiX)
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
-	uint8_t * data_p=pxStartOfStack+1;
-	uint16_t length = pxEndOfStack-pxStartOfStack;
-	uint8_t poolH;
-	volatile uint16_t hammingBits = 0;
-	uint16_t pBit;
+	uint8_t * ucDataP=pxStartOfStack+1;
+	uint16_t uiLength = pxEndOfStack-pxStartOfStack;
+	uint8_t ucPoolH;
+	uint16_t uiHammingBits = 0;
+	uint16_t uiPBit;
 	uint16_t i;
-	uint16_t posbit;
+	uint16_t uiPosBit;
 	
-	poolH = 0;
-	pBit = 0;
-	for(i=0;i<length;i++){
-		poolH ^= (*(data_p+i) & 0xAA);
+	ucPoolH = 0;
+	uiPBit = 0;
+	for(i=0;i<uiLength;i++){
+		ucPoolH ^= (*(ucDataP+i) & 0xAA);
 	}
-	hammingBits += (paridade(poolH))<<pBit;
+	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
 	
-	poolH = 0;
-	pBit = 1;
-	for(i=0;i<length;i++){
-		poolH ^= (*(data_p+i) & 0xCC);
+	ucPoolH = 0;
+	uiPBit = 1;
+	for(i=0;i<uiLength;i++){
+		ucPoolH ^= (*(ucDataP+i) & 0xCC);
 	}
-	hammingBits += (paridade(poolH))<<pBit;
+	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
 	
-	poolH = 0;
-	pBit = 2;
-	for(i=0;i<length;i++){
-		poolH ^= (*(data_p+i) & 0xF0);
+	ucPoolH = 0;
+	uiPBit = 2;
+	for(i=0;i<uiLength;i++){
+		ucPoolH ^= (*(ucDataP+i) & 0xF0);
 	}
-	hammingBits += (paridade(poolH))<<pBit;
+	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
 	
-	pBit=3;
-	poolH = 0;
-	posbit = (1<<(pBit-3));
-	for(i=0;i<length;i++){
-		if((i+1) & (posbit)){
-			poolH ^= (*(data_p+i));
+	uiPBit=3;
+	ucPoolH = 0;
+	uiPosBit = (1<<(uiPBit-3));
+	for(i=0;i<uiLength;i++){
+		if((i+1) & (uiPosBit)){
+			ucPoolH ^= (*(ucDataP+i));
 		}
 	}
-	hammingBits += (paridade(poolH))<<pBit;
+	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
 	
-	uint8_t pBitmax = fls(length*8);
-	//for(pBit=4;((1<<(pBit-2))-1)<=(length);pBit++){
+	uint8_t pBitmax = ucFls(uiLength*8);
 	
-	for(pBit=4;pBit<pBitmax;pBit++){
-		poolH = 0;
-		posbit = (1<<(pBit-3));
-		for(i=0;i<length;i++){
-			if((i+1) & (posbit)){
-				poolH ^= (*(data_p+i));
+	for(uiPBit=4;uiPBit<pBitmax;uiPBit++){
+		ucPoolH = 0;
+		uiPosBit = (1<<(uiPBit-3));
+		for(i=0;i<uiLength;i++){
+			if((i+1) & (uiPosBit)){
+				ucPoolH ^= (*(ucDataP+i));
 			}
 		}
-		hammingBits += (paridade(poolH))<<pBit;
+		uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
 	}
-	return (ChecksumType_t)hammingBits;
+	return (ChecksumType_t)uiHammingBits;
 }
 
 
