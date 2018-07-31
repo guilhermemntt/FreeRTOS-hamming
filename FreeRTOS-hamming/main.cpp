@@ -51,7 +51,7 @@ extern "C"{
 	void vApplicationTaskChecksumHook1( void ){
 		globa1=0x02;
 	}
-
+/*
 uint16_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 	{
 		volatile StackType_t* i;
@@ -63,4 +63,5 @@ uint16_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatil
 		globa=0xaa;
 		return (uint16_t)xChecksum;
 	}
+	*/
 }

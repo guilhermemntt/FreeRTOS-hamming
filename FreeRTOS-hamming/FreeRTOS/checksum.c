@@ -47,7 +47,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #define paridade(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
 
-static inline uint8_t fls(uint16_t uiX)
+static inline uint8_t uiFls(uint16_t uiX)
 {
           uint8_t uiR = 16;
   
