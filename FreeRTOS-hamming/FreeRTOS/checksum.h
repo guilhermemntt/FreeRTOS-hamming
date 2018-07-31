@@ -48,7 +48,6 @@
 			if(pxCurrentTCB->ucChecksum == 0){ \
 				vApplicationTaskChecksumHook(); \
 			} else { \
-				vApplicationTaskChecksumHook1(); \
 				pxCurrentTCB->pxTopOfStack[pxCurrentTCB->ucChecksum /8] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
 			} \
 		}while(0);
@@ -56,7 +55,6 @@
 		static inline uint8_t uiFls(uint16_t uiX);
 			
 		void vApplicationTaskChecksumHook( void ) __attribute__((weak));
-		void vApplicationTaskChecksumHook1( void ) __attribute__((weak));
 		
 	#elif ( configSUPPORT_TASK_CHECKSUM==4 )
 	
