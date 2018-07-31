@@ -6,48 +6,48 @@
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
 	volatile StackType_t* i;
-	uint16_t xChecksum = 0;
+	uint16_t usChecksum = 0;
 	for(i = pxEndOfStack ;i != pxStartOfStack ;i+=portSTACK_GROWTH)
 	{
-		xChecksum^=*i;
+		usChecksum^=*i;
 	}
-	return (uint16_t)xChecksum;
+	return usChecksum;
 }
 
 #elif( configSUPPORT_TASK_CHECKSUM==2 )
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
-	uint16_t	uiPolinomio=0x8408;
+	uint16_t	usPolinomio=0x8408;
 	uint8_t	i;
-	uint16_t	uiData;
-	uint16_t	uiCrc;
+	uint16_t	usData;
+	uint16_t	usCrc;
+	usCrc=0xffff;
 	
-	uiCrc=0xffff;
 	if(pxStartOfStack==pxEndOfStack){
-		return	(~uiCrc);
+		return	(~usCrc);
 	}
 	do{
-		for(i = 0, uiData = (uint16_t) 0xff && *pxStartOfStack++; i < 8; i++,uiData >>= 1){
-			if((uiCrc & 0x0001)^(uiData & 0x0001)){
-				uiCrc = (uiCrc >> 1)^uiPolinomio;
+		for(i = 0, usData = (uint16_t) 0xff && *pxStartOfStack++; i < 8; i++,usData >>= 1){
+			if((usCrc & 0x0001)^(usData & 0x0001)){
+				usCrc = (usCrc >> 1)^usPolinomio;
 			}
 			else{
-				uiCrc >>= 1;
+				usCrc >>= 1;
 			}
 		}
 	} while (pxEndOfStack != pxStartOfStack);
-	uiCrc = ~uiCrc;
-	uiData = uiCrc;
-	uiCrc = (uiCrc << 8)|(uiData >> 8 & 0xff);
-	return (uiCrc);
+	usCrc = ~usCrc;
+	usData = usCrc;
+	usCrc = (usCrc << 8)|(usData >> 8 & 0xff);
+	return (usCrc);
 }
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
 
 #define PARITY(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
 
-static inline uint8_t ucFls(uint16_t uiX)
+static inline uint8_t prvFls(uint16_t uiX)
 {
           uint8_t uiR = 16;
   
@@ -76,58 +76,58 @@ static inline uint8_t ucFls(uint16_t uiX)
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
-	uint8_t * ucDataP=pxStartOfStack+1;
-	uint16_t uiLength = pxEndOfStack-pxStartOfStack;
+	uint8_t * pucDataP=pxStartOfStack+1;
+	uint16_t usLength = pxEndOfStack-pxStartOfStack;
 	uint8_t ucPoolH;
-	uint16_t uiHammingBits = 0;
-	uint16_t uiPBit;
+	uint16_t usHammingBits = 0;
+	uint16_t usPBit;
 	uint16_t i;
-	uint16_t uiPosBit;
+	uint16_t usPosBit;
 	
 	ucPoolH = 0;
-	uiPBit = 0;
-	for(i=0;i<uiLength;i++){
-		ucPoolH ^= (*(ucDataP+i) & 0xAA);
+	usPBit = 0;
+	for(i=0;i<usLength;i++){
+		ucPoolH ^= (*(pucDataP+i) & 0xAA);
 	}
-	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
+	usHammingBits += (PARITY(ucPoolH))<<usPBit;
 	
 	ucPoolH = 0;
-	uiPBit = 1;
-	for(i=0;i<uiLength;i++){
-		ucPoolH ^= (*(ucDataP+i) & 0xCC);
+	usPBit = 1;
+	for(i=0;i<usLength;i++){
+		ucPoolH ^= (*(pucDataP+i) & 0xCC);
 	}
-	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
+	usHammingBits += (PARITY(ucPoolH))<<usPBit;
 	
 	ucPoolH = 0;
-	uiPBit = 2;
-	for(i=0;i<uiLength;i++){
-		ucPoolH ^= (*(ucDataP+i) & 0xF0);
+	usPBit = 2;
+	for(i=0;i<usLength;i++){
+		ucPoolH ^= (*(pucDataP+i) & 0xF0);
 	}
-	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
+	usHammingBits += (PARITY(ucPoolH))<<usPBit;
 	
-	uiPBit=3;
+	usPBit=3;
 	ucPoolH = 0;
-	uiPosBit = (1<<(uiPBit-3));
-	for(i=0;i<uiLength;i++){
-		if((i+1) & (uiPosBit)){
-			ucPoolH ^= (*(ucDataP+i));
+	usPosBit = (1<<(usPBit-3));
+	for(i=0;i<usLength;i++){
+		if((i+1) & (usPosBit)){
+			ucPoolH ^= (*(pucDataP+i));
 		}
 	}
-	uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
+	usHammingBits += (PARITY(ucPoolH))<<usPBit;
 	
-	uint8_t pBitmax = ucFls(uiLength*8);
+	uint8_t pBitmax = prvFls(usLength*8);
 	
-	for(uiPBit=4;uiPBit<pBitmax;uiPBit++){
+	for(usPBit=4;usPBit<pBitmax;usPBit++){
 		ucPoolH = 0;
-		uiPosBit = (1<<(uiPBit-3));
-		for(i=0;i<uiLength;i++){
-			if((i+1) & (uiPosBit)){
-				ucPoolH ^= (*(ucDataP+i));
+		usPosBit = (1<<(usPBit-3));
+		for(i=0;i<usLength;i++){
+			if((i+1) & (usPosBit)){
+				ucPoolH ^= (*(pucDataP+i));
 			}
 		}
-		uiHammingBits += (PARITY(ucPoolH))<<uiPBit;
+		usHammingBits += (PARITY(ucPoolH))<<usPBit;
 	}
-	return (ChecksumType_t)uiHammingBits;
+	return (ChecksumType_t)usHammingBits;
 }
 
 

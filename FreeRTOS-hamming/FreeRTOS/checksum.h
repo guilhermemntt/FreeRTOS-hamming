@@ -52,7 +52,7 @@
 			} \
 		}while(0);
 				
-		static inline uint8_t ucFls(uint16_t uiX);
+		static inline uint8_t prvFls(uint16_t uiX);
 			
 		void vApplicationTaskChecksumHook( void ) __attribute__((weak));
 		
