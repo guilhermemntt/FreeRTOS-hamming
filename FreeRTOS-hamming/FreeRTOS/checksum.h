@@ -58,11 +58,13 @@
 				if(pxCurrentTCB->ucChecksum == 0){ \
 					vApplicationTaskChecksumHook(); \
 				} else { \
-					pxCurrentTCB->pxTopOfStack[(-1)*portSTACK_GROWTH*(pxCurrentTCB->ucChecksum /8)] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
+					pxCurrentTCB->pxTopOfStack[-portSTACK_GROWTH*(pxCurrentTCB->ucChecksum /8)] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
 				} \
 			}while(0);
 				
-		static inline uint8_t prvFls(uint16_t uiX);
+		static inline uint16_t prvAbs(int16_t sX);
+				
+		static inline uint8_t prvFls(uint16_t usX);
 			
 		void vApplicationTaskChecksumHook( void ) __attribute__((weak));
 	
