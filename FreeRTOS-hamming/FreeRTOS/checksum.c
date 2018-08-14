@@ -118,7 +118,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
     ucPoolH = 0;

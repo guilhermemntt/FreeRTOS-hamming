@@ -336,7 +336,7 @@ static inline uint16_t prvAbs(int16_t sX) {
      1b2:	8c 0f       	add	r24, r28
      1b4:	9d 1f       	adc	r25, r29
 
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
      1b6:	9b 01       	movw	r18, r22
      1b8:	22 0f       	add	r18, r18
      1ba:	33 1f       	adc	r19, r19
@@ -418,7 +418,7 @@ static inline uint8_t prvFls(uint16_t usX) {
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
      210:	a4 2e       	mov	r10, r20
@@ -448,7 +448,7 @@ static inline uint8_t prvFls(uint16_t usX) {
      230:	ff 2e       	mov	r15, r31
      232:	f0 2d       	mov	r31, r0
 
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
     ucPoolH = 0;
@@ -469,7 +469,7 @@ static inline uint8_t prvFls(uint16_t usX) {
      24c:	50 e0       	ldi	r21, 0x00	; 0
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
     ucPoolH = 0;
@@ -509,7 +509,7 @@ static inline uint16_t prvAbs(int16_t sX) {
      270:	21 81       	ldd	r18, Z+1	; 0x01
      272:	92 26       	eor	r9, r18
      274:	31 96       	adiw	r30, 0x01	; 1
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
     ucPoolH = 0;
@@ -548,7 +548,7 @@ static inline uint16_t prvAbs(int16_t sX) {
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
-  ucPBitMax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
      2a8:	0f 5f       	subi	r16, 0xFF	; 255
