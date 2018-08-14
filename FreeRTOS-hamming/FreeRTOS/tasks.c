@@ -232,7 +232,7 @@ count overflows. */
 
 /*-----------------------------------------------------------*/
 
-/*
+/*xHan
  * Place the task represented by pxTCB into the appropriate ready list for
  * the task.  It is inserted at the end of the list.
  */
