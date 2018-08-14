@@ -45,89 +45,88 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
 
-#define checksumPARITY(n) ((0x6996 >> ((n^(n>>4))&0x0f))&0x01)
+#define checksumPARITY(n) ((0x6996 >> ((n ^ (n >> 4)) & 0x0f)) & 0x01)
+#define checksumABS(x) ((x >> 15) ^ (x + (x >> 15)))
 
-static inline uint8_t prvFls(uint16_t uiX)
-{
-          uint8_t uiR = 16;
-  
-          if (!uiX){
-                  return 0;
-		  }
-          if (!(uiX & 0xff00u)) {
-                  uiX <<= 8;
-                  uiR -= 8;
-          }
-          if (!(uiX & 0xf000u)) {
-                  uiX <<= 4;
-                  uiR -= 4;
-          }
-          if (!(uiX & 0xc000u)) {
-                  uiX <<= 2;
-                  uiR -= 2;
-          }
-          if (!(uiX & 0x8000u)) {
-                  uiX <<= 1;
-                  uiR -= 1;
-          }
-         return uiR;
+static inline uint8_t prvFls(uint16_t usX) {
+  uint8_t ucR = 16;
+
+  if (!usX) {
+    return 0;
+  }
+  if (!(usX & 0xff00u)) {
+    usX <<= 8;
+    ucR -= 8;
+  }
+  if (!(usX & 0xf000u)) {
+    usX <<= 4;
+    ucR -= 4;
+  }
+  if (!(usX & 0xc000u)) {
+    usX <<= 2;
+    ucR -= 2;
+  }
+  if (!(usX & 0x8000u)) {
+    usX <<= 1;
+    ucR -= 1;
+  }
+  return ucR;
+}
+
+ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t *pxEndOfStack) {  // pxStack
+  uint8_t *pucDataP = pxStartOfStack - portSTACK_GROWTH;
+  uint16_t usLength = pxEndOfStack - pxStartOfStack;
+  uint8_t ucPoolH;
+  uint16_t usHammingBits = 0;
+  uint16_t usPBit;
+  uint16_t i;
+  uint16_t usPosBit;
+
+  ucPoolH = 0;
+  usPBit = 0;
+  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+    ucPoolH ^= (*(pucDataP + i) & 0xAA);
+  }
+  usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
+
+  ucPoolH = 0;
+  usPBit = 1;
+  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+    ucPoolH ^= (*(pucDataP + i) & 0xCC);
+  }
+  usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
+
+  ucPoolH = 0;
+  usPBit = 2;
+  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+    ucPoolH ^= (*(pucDataP + i) & 0xF0);
+  }
+  usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
+
+  usPBit = 3;
+  ucPoolH = 0;
+  usPosBit = (1 << (usPBit - 3));
+  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+    if (checksumABS(i - portSTACK_GROWTH) & (usPosBit)) {
+      ucPoolH ^= (*(pucDataP + i));
+    }
+  }
+  usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
+
+  uint8_t pBitmax = prvFls(usLength * 8 * (-1) * portSTACK_GROWTH);
+
+  for (usPBit = 4; usPBit < pBitmax; usPBit++) {
+    ucPoolH = 0;
+    usPosBit = (1 << (usPBit - 3));
+    for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+      if (checksumABS(i - portSTACK_GROWTH) & (usPosBit)) {
+        ucPoolH ^= (*(pucDataP + i));
+      }
+    }
+    usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
   }
 
-
-ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
-{
-	uint8_t * pucDataP=pxStartOfStack+1;
-	uint16_t usLength = pxEndOfStack-pxStartOfStack;
-	uint8_t ucPoolH;
-	uint16_t usHammingBits = 0;
-	uint16_t usPBit;
-	uint16_t i;
-	uint16_t usPosBit;
-	
-	ucPoolH = 0;
-	usPBit = 0;
-	for(i=0;i<usLength;i++){
-		ucPoolH ^= (*(pucDataP+i) & 0xAA);
-	}
-	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
-	
-	ucPoolH = 0;
-	usPBit = 1;
-	for(i=0;i<usLength;i++){
-		ucPoolH ^= (*(pucDataP+i) & 0xCC);
-	}
-	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
-	
-	ucPoolH = 0;
-	usPBit = 2;
-	for(i=0;i<usLength;i++){
-		ucPoolH ^= (*(pucDataP+i) & 0xF0);
-	}
-	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
-	
-	usPBit=3;
-	ucPoolH = 0;
-	usPosBit = (1<<(usPBit-3));
-	for(i=0;i<usLength;i++){
-		if((i+1) & (usPosBit)){
-			ucPoolH ^= (*(pucDataP+i));
-		}
-	}
-	usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
-	
-	uint8_t pBitmax = prvFls(usLength*8);
-	
-	for(usPBit=4;usPBit<pBitmax;usPBit++){
-		ucPoolH = 0;
-		usPosBit = (1<<(usPBit-3));
-		for(i=0;i<usLength;i++){
-			if((i+1) & (usPosBit)){
-				ucPoolH ^= (*(pucDataP+i));
-			}
-		}
-		usHammingBits += (checksumPARITY(ucPoolH))<<usPBit;
-	}
-	return (ChecksumType_t)usHammingBits;
+  return usHammingBits;
 }
 
 

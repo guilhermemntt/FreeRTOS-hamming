@@ -58,7 +58,7 @@
 				if(pxCurrentTCB->ucChecksum == 0){ \
 					vApplicationTaskChecksumHook(); \
 				} else { \
-					pxCurrentTCB->pxTopOfStack[pxCurrentTCB->ucChecksum /8] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
+					pxCurrentTCB->pxTopOfStack[(-1)*portSTACK_GROWTH*(pxCurrentTCB->ucChecksum /8)] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
 				} \
 			}while(0);
 				
