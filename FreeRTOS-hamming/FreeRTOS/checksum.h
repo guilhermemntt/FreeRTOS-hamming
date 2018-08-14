@@ -45,8 +45,7 @@
 			if(pxCurrentTCB->ucChecksum == checksumGET_TASK_CHECKSUM){ \
 				vApplicationTaskChecksumHook(); \
 			}else{ \
-				vTaskDelete((TaskHandle_t) pxCurrentTCB); \
-				taskSELECT_HIGHEST_PRIORITY_TASK(); \
+				vTaskDelete(NULL); \
 			} \
 		}while(0);
 				
