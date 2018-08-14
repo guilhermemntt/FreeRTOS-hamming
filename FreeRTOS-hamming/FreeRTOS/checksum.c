@@ -79,7 +79,7 @@ static inline uint8_t prvFls(uint16_t usX) {
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t *pxEndOfStack) {  // pxStack
   uint8_t *pucDataP = pxStartOfStack - portSTACK_GROWTH;
-  uint16_t usLength = pxEndOfStack - pxStartOfStack;
+  int16_t sLength = pxEndOfStack - pxStartOfStack;
   uint8_t ucPoolH;
   uint16_t usHammingBits = 0;
   uint16_t usPBit;
@@ -89,21 +89,21 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
   ucPoolH = 0;
   usPBit = 0;
-  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+  for (i = 0; i != sLength; i -= portSTACK_GROWTH) {
     ucPoolH ^= (*(pucDataP + i) & 0xAA);
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
   ucPoolH = 0;
   usPBit = 1;
-  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+  for (i = 0; i != sLength; i -= portSTACK_GROWTH) {
     ucPoolH ^= (*(pucDataP + i) & 0xCC);
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
   ucPoolH = 0;
   usPBit = 2;
-  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+  for (i = 0; i != sLength; i -= portSTACK_GROWTH) {
     ucPoolH ^= (*(pucDataP + i) & 0xF0);
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
@@ -111,19 +111,19 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
   usPBit = 3;
   ucPoolH = 0;
   usPosBit = (1 << (usPBit - 3));
-  for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+  for (i = 0; i != sLength; i -= portSTACK_GROWTH) {
     if (prvAbs(i - portSTACK_GROWTH) & (usPosBit)) {
       ucPoolH ^= (*(pucDataP + i));
     }
   }
   usHammingBits += (checksumPARITY(ucPoolH)) << usPBit;
 
-  ucPBitMax = prvFls(usLength * 8  * -portSTACK_GROWTH);
+  ucPBitMax = prvFls(sLength * 8  * -portSTACK_GROWTH);
 
   for (usPBit = 4; usPBit < ucPBitMax; usPBit++) {
     ucPoolH = 0;
     usPosBit = (1 << (usPBit - 3));
-    for (i = 0; i != usLength; i -= portSTACK_GROWTH) {
+    for (i = 0; i != sLength; i -= portSTACK_GROWTH) {
       if (prvAbs(i - portSTACK_GROWTH) & (usPosBit)) {
         ucPoolH ^= (*(pucDataP + i));
       }
