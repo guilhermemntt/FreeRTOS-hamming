@@ -13,8 +13,10 @@
 	
 		#if( portSTACK_GROWTH == (-1))
 			#define checksumGET_TASK_CHECKSUM uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxEndOfStack)
+			#define checksumGET_TASK_CHECKSUM_ON_CREATION uxChecksumGetTaskChecksum(pxNewTCB->pxTopOfStack, pxNewTCB->pxEndOfStack)
 		#else
 			#define checksumGET_TASK_CHECKSUM uxChecksumGetTaskChecksum(pxCurrentTCB->pxTopOfStack, pxCurrentTCB->pxStack)
+			#define checksumGET_TASK_CHECKSUM_ON_CREATION uxChecksumGetTaskChecksum(pxNewTCB->pxTopOfStack, pxNewTCB->pxStack)
 		#endif
 	
 		typedef	uint16_t	ChecksumType_t;
@@ -30,12 +32,18 @@
 		#define INCLUDE_vTaskDelete 1
 
 		#define traceTASK_CREATE( pxNewTCB ) do{ \
-			pxCurrentTCB->ucChecksum = uxChecksumGetTaskChecksum(pxNewTCB->pxTopOfStack, pxNewTCB->pxEndOfStack);\
+			pxCurrentTCB->ucChecksum = checksumGET_TASK_CHECKSUM_ON_CREATION; \
 		}while(0);
 		
 		#define traceTASK_SWITCHED_OUT() 	do{ \
-			pxCurrentTCB->ucChecksum = checksumGET_TASK_CHECKSUM;\
+			pxCurrentTCB->ucChecksum = checksumGET_TASK_CHECKSUM; \
 		}while(0);
+		
+		#if( configUSE_TASK_CHECKSUM_HOOK > 0 )
+			void vApplicationTaskChecksumHook( void ) __attribute__((weak));
+		#else
+			void vApplicationTaskChecksumHook( void ){}
+		#endif
 	
 	#endif
 		
@@ -48,8 +56,6 @@
 				vTaskDelete(NULL); \
 			} \
 		}while(0);
-				
-		void vApplicationTaskChecksumHook( void ) __attribute__((weak));
 			
 	#elif( configSUPPORT_TASK_CHECKSUM == 3 )
 
@@ -65,8 +71,6 @@
 		static inline uint16_t prvAbs(int16_t sX);
 				
 		static inline uint8_t prvFls(uint16_t usX);
-			
-		void vApplicationTaskChecksumHook( void ) __attribute__((weak));
 	
 	#endif
 	
