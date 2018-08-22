@@ -5,7 +5,7 @@
 
 ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 {
-	volatile StackType_t* i;
+	StackType_t* i;
 	uint16_t usChecksum = 0;
 	for(i = pxEndOfStack ;i != pxStartOfStack ;i+=portSTACK_GROWTH)
 	{
@@ -21,7 +21,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 	uint16_t	usPolinomio=0x8408;
 	uint8_t	i;
 	uint16_t	usData;
-	uint16_t	usCrc;
+	volatile uint16_t	usCrc;
 	usCrc=0xffff;
 	
 	if(pxStartOfStack==pxEndOfStack){
@@ -40,7 +40,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 	usCrc = ~usCrc;
 	usData = usCrc;
 	usCrc = (usCrc << 8)|(usData >> 8 & 0xff);
-	return (usCrc);
+	return usCrc;
 }
 
 #elif ( configSUPPORT_TASK_CHECKSUM==3 )
@@ -136,13 +136,19 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 
 #elif ( configSUPPORT_TASK_CHECKSUM==4 )
 	
-    	ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack){}
+    ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack){}
 	
 #endif
 
 #if ( configUSE_TASK_CHECKSUM_HOOK == 1 )
 
-	void vApplicationTaskChecksumHook( void ){}
+	vApplicationTaskChecksumSucceedHook(){
+		volatile char a=10;
+	}
+	
+	vApplicationTaskChecksumFailedHook(){
+		for(;;);
+	}
 
 #endif
 

@@ -40,9 +40,8 @@
 		}while(0);
 		
 		#if( configUSE_TASK_CHECKSUM_HOOK > 0 )
-			void vApplicationTaskChecksumHook( void ) __attribute__((weak));
-		#else
-			void vApplicationTaskChecksumHook( void ){}
+			extern void vApplicationTaskChecksumSucceedHook( void ) __attribute__(( weak ));
+			extern void vApplicationTaskChecksumFailedHook( void ) __attribute__(( weak ));
 		#endif
 	
 	#endif
@@ -51,9 +50,9 @@
 				
 		#define traceTASK_SWITCHED_IN() 	do{ \
 			if(pxCurrentTCB->ucChecksum == checksumGET_TASK_CHECKSUM){ \
-				vApplicationTaskChecksumHook(); \
+				vApplicationTaskChecksumSucceedHook(); \
 			}else{ \
-				vTaskDelete(NULL); \
+				vApplicationTaskChecksumFailedHook(); \
 			} \
 		}while(0);
 			
@@ -62,7 +61,7 @@
 			#define traceTASK_SWITCHED_IN() 	do{ \
 				pxCurrentTCB->ucChecksum ^= checksumGET_TASK_CHECKSUM; \
 				if(pxCurrentTCB->ucChecksum == 0){ \
-					vApplicationTaskChecksumHook(); \
+					vApplicationTaskChecksumSucceedHook(); \
 				} else { \
 					pxCurrentTCB->pxTopOfStack[-portSTACK_GROWTH*(pxCurrentTCB->ucChecksum /8)] ^=  (1<<(pxCurrentTCB->ucChecksum%8)); \
 				} \
@@ -74,9 +73,9 @@
 	
 	#endif
 	
-	#if ( configSUPPORT_TASK_CHECKSUM ==4 )
+	#if ( configSUPPORT_TASK_CHECKSUM == 4 )
 	
-		ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack) __attribute__((weak));
+		extern ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack) __attribute__((weak));
 		
 	#endif
 		

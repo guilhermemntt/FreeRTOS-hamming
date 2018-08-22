@@ -198,7 +198,6 @@ to exclude the API function. */
 
 //
 
-#define configSUPPORT_TASK_CHECKSUM         3
+#define configSUPPORT_TASK_CHECKSUM         2
 #define configUSE_TASK_CHECKSUM_HOOK		1
-
 #endif /* FREERTOS_CONFIG_H */
