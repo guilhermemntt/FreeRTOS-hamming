@@ -42,6 +42,10 @@ int main(void)
 }
 
 extern "C"{
+	
+	void vApplicationTaskChecksumFailedHook(){
+		volatile char b=0;		
+		}
 /*
 uint16_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, volatile StackType_t	*pxEndOfStack)
 	{

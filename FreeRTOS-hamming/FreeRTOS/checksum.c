@@ -28,7 +28,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 		return	(~usCrc);
 	}
 	do{
-		for (i = 0, usData = (uint16_t)0xff && *(pxStartOfStack-=portSTACK_GROWTH); i < 8; i++, usData >>= 1) {
+		for (i = 0, usData = (uint16_t)0xff & *pxStartOfStack; i < 8; i++, usData >>= 1) {
 			if((usCrc & 0x0001)^(usData & 0x0001)){
 				usCrc = (usCrc >> 1)^usPolinomio;
 			}
@@ -36,6 +36,7 @@ ChecksumType_t uxChecksumGetTaskChecksum(volatile StackType_t *pxStartOfStack, v
 				usCrc >>= 1;
 			}
 		}
+		pxStartOfStack-=portSTACK_GROWTH;
 	} while (pxEndOfStack != pxStartOfStack);
 	usCrc = ~usCrc;
 	usData = usCrc;
